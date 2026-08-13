@@ -152,20 +152,22 @@ class DashboardScreen extends ConsumerWidget {
                   final total = entries.fold(0.0, (s, e) => s + e.value);
                   return Row(
                     children: [
+                      // 注意：fl_chart 的扇形外半径 = centerSpaceRadius + section.radius，
+                      // 必须 ≤ 盒子边长的一半，否则会溢出卡片。此处 34 + 28 = 62 ≤ 70。
                       SizedBox(
-                        width: 120,
-                        height: 120,
+                        width: 140,
+                        height: 140,
                         child: PieChart(
                           PieChartData(
                             sectionsSpace: 2,
-                            centerSpaceRadius: 38,
+                            centerSpaceRadius: 34,
                             sections: entries.asMap().entries.map((e) {
                               final idx = e.key;
                               final entry = e.value;
                               return PieChartSectionData(
                                 color: _piePalette[idx % _piePalette.length],
                                 value: entry.value,
-                                radius: 52,
+                                radius: 28,
                                 title: '',
                               );
                             }).toList(),
