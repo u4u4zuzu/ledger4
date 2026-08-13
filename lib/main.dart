@@ -130,6 +130,20 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   void initState() {
     super.initState();
     _initLock();
+    // 启动后静默拉取一次实时行情，让基金净值 / 股票“现价”显示最新值，
+    // 而不是停留在演示种子价。无网络时静默失败，保留上次同步值。
+    Future.microtask(_autoRefreshQuotes);
+  }
+
+  /// 静默刷新全部行情（无 toast、不显示刷新中转），用于启动时自动同步
+  Future<void> _autoRefreshQuotes() async {
+    final db = ref.read(databaseProvider);
+    try {
+      await FundSyncService(db).syncAllFundNavs();
+      await StockSyncService(db).syncAllStockPrices();
+    } catch (_) {
+      // 静默失败：保留上次同步值或演示种子值
+    }
   }
 
   Future<void> _initLock() async {
